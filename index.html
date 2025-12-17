@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏠 ثبت رایگان دکوراسیون</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Vazir', Tahoma, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; 
+        }
+        .container { max-width: 500px; margin: 0 auto; }
+        .form-card { 
+            background: white; border-radius: 20px; 
+            padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
+            text-align: center;
+        }
+        h1 { 
+            background: linear-gradient(45deg, #667eea, #764ba2); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            margin-bottom: 20px; font-size: 1.8em;
+        }
+        input, select, textarea { 
+            width: 100%; padding: 15px; margin: 10px 0; 
+            border: 2px solid #e2e8f0; border-radius: 10px; 
+            font-size: 16px; background: #f8fafc;
+        }
+        button { 
+            background: linear-gradient(45deg, #48bb78, #38a169); 
+            color: white; padding: 18px; border: none; 
+            border-radius: 12px; cursor: pointer; font-size: 18px; 
+            font-weight: bold; width: 100%; margin-top: 20px;
+        }
+        .success { 
+            background: linear-gradient(135deg, #48bb78, #38a169); 
+            color: white; border-radius: 15px; padding: 30px; 
+            text-align: center; display: none;
+        }
+        .hidden { display: none; }
+        .admin-panel { 
+            background: white; border-radius: 20px; 
+            padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
+            text-align: center; display: none;
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: right; border-bottom: 1px solid #eee; }
+        .status { padding: 5px 10px; border-radius: 20px; color: white; font-weight: bold; }
+        .seen { background: #4299e1; }
+        .done { background: #48bb78; }
+        @media (max-width: 480px) { .form-card, .admin-panel { padding: 30px 20px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- فرم مشتری -->
+        <div id="customerForm" class="form-card">
+            <h1>🏠 ثبت درخواست دکوراسیون</h1>
+            <p style="color: #666; margin-bottom: 30px;">رایگان و بدون تعهد - ۲ دقیقه زمان</p>
+            
+            <input type="text" id="name" placeholder="👤 نام و نام خانوادگی">
+            <input type="tel" id="phone" placeholder="📞 شماره تماس">
+            <input type="text" id="address" placeholder="📍 آدرس کامل">
+            <input type="text" id="project" placeholder="🏠 نوع پروژه (آشپزخانه، پذیرایی...)">
+            <input type="number" id="budget" placeholder="💰 بودجه تقریبی (تومان)">
+            <textarea id="notes" placeholder="📝 متراژ، سبک، نکات مهم..." rows="3"></textarea>
+            
+            <select id="priority">
+                <option value="عادی">⭐ عادی</option>
+                <option value="بالا">⭐⭐ بالا</option>
+                <option value="فوری">⭐⭐⭐ فوری</option>
+            </select>
+            
+            <button onclick="submitForm()">✅ ارسال درخواست</button>
+        </div>
+
+        <!-- پنل ادمین -->
+        <div id="adminLogin" class="form-card" style="display: none;">
+            <h1>🔐 پنل مدیریت</h1>
+            <input type="password" id="adminPass" placeholder="رمز عبور">
+            <button onclick="loginAdmin()">ورود</button>
+            <p style="font-size: 12px; color: #666; margin-top: 10px;">راهنما: Ctrl+Enter</p>
+        </div>
+
+        <div id="adminPanel" class="admin-panel">
+            <h1>📋 لیست مشتریان</h1>
+            <button onclick="logout()" style="background: #e53e3e; margin-bottom: 20px;">خروج</button>
+            <div id="customersList"></div>
+        </div>
+
+        <!-- موفقیت -->
+        <div id="successSection" class="success">
+            <h2>🎉 درخواست ثبت شد!</h2>
+            <p style="font-size: 18px;">شماره پیگیری: <strong id="trackId"></strong></p>
+            <p>ظرف <strong>۲۴ ساعت</strong> تماس می‌گیریم 📞</p>
+            <p style="font-size: 14px; opacity: 0.9;">ممنون از اعتمادتون!</p>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const isCustomer = urlParams.get('mode') === 'customer';
+        
+        // نمایش فرم مشتری یا پنل ادمین
+        if (isCustomer || !localStorage.getItem('adminMode')) {
+            document.getElementById('customerForm').style.display = 'block';
+            document.getElementById('adminLogin').style.display = 'none';
+        } else {
+            showAdminLogin();
+        }
+
+        // کلید میانبر ادمین
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                showAdminLogin();
+            }
+        });
+
+        function showAdminLogin() {
+            document.getElementById('customerForm').style.display = 'none';
+            document.getElementById('adminLogin').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+
+        function loginAdmin() {
+            const pass = document.getElementById('adminPass').value;
+            if (pass === 'admin123') {
+                localStorage.setItem('adminMode', 'true');
+                loadCustomers();
+            } else {
+                alert('❌ رمز اشتباه!');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('adminMode');
+            document.getElementById('adminLogin').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('customerForm').style.display = 'block';
+        }
+
+        function submitForm() {
+            const data = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                project: document.getElementById('project').value,
+                budget: document.getElementById('budget').value,
+                notes: document.getElementById('notes').value,
+                priority: document.getElementById('priority').value,
+                track: 'TRK' + Date.now().toString().slice(-6),
+                date: new Date().toLocaleDateString('fa-IR'),
+                status: 'دیده نشده'
+            };
+            
+            if (!data.name || !data.phone) {
+                alert('❌ نام و شماره تماس الزامی است!');
+                return;
+            }
+            
+            let customers = JSON.parse(localStorage.getItem('customers')) || [];
+            customers.unshift(data);
+            localStorage.setItem('customers', JSON.stringify(customers));
+            
+            document.getElementById('trackId').textContent = data.track;
+            document.getElementById('customerForm').classList.add('hidden');
+            document.getElementById('successSection').style.display = 'block';
+            
+            const message = `🏠 درخواست جدید دکوراسیون\n\n👤 ${data.name}\n📞 ${data.phone}\n🏠 ${data.project}\n💰 ${data.budget}\n⭐ ${data.priority}\n\n#${data.track}`;
+            setTimeout(() => {
+                if (confirm('ارسال به واتساپ؟')) {
+                    window.open(`https://wa.me/989123456789?text=${encodeURIComponent(message)}`);
+                }
+            }, 2000);
+        }
+
+        function loadCustomers() {
+            const customers = JSON.parse(localStorage.getItem('customers')) || [];
+            const list = document.getElementById('customersList');
+            
+            if (customers.length === 0) {
+                list.innerHTML = '<p style="text-align:center;color:#666;">هیچ درخواستی ثبت نشده</p>';
+                return;
+            }
+            
+            let html = '<table><tr><th>نام</th><th>تلفن</th><th>پروژه</th><th>بودجه</th><th>اولویت</th><th>تاریخ</th><th>وضعیت</th></tr>';
+            
+            customers.forEach((customer, index) => {
+                html += `
+                    <tr>
+                        <td>${customer.name}</td>
+                        <td>${customer.phone}</td>
+                        <td>${customer.project}</td>
+                        <td>${customer.budget || 'نامشخص'}</td>
+                        <td>${customer.priority}</td>
+                        <td>${customer.date}</td>
+                        <td>
+                            <select onchange="updateStatus(${index}, this.value)" style="border-radius:10px;">
+                                <option ${customer.status === 'دیده نشده' ? 'selected' : ''}>دیده نشده</option>
+                                <option ${customer.status === 'دیده شده' ? 'selected' : ''}>دیده شده</option>
+                                <option ${customer.status === 'انجام شده' ? 'selected' : ''}>انجام شده</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += '</table>';
+            list.innerHTML = html;
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('adminLogin').style.display = 'none';
+        }
+
+        function updateStatus(index, status) {
+            let customers = JSON.parse(localStorage.getItem('customers')) || [];
+            customers[index].status = status;
+            localStorage.setItem('customers', JSON.stringify(customers));
+        }
+    </script>
+</body>
+</html>
