@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏠 ثبت رایگان دکوراسیون</title>
+    <title>🏠 ثبت اطلاعات سفارش</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -56,8 +56,8 @@
     <div class="container">
         <!-- فرم مشتری -->
         <div id="customerForm" class="form-card">
-            <h1>🏠 ثبت درخواست دکوراسیون</h1>
-            <p style="color: #666; margin-bottom: 30px;">رایگان و بدون تعهد - ۲ دقیقه زمان</p>
+            <h1>🏠 ثبت درخواست سفارش</h1>
+            <p style="color: #666; margin-bottom: 30px;"></p>
             
             <input type="text" id="name" placeholder="👤 نام و نام خانوادگی">
             <input type="tel" id="phone" placeholder="📞 شماره تماس">
@@ -170,7 +170,7 @@
             const message = `🏠 درخواست جدید دکوراسیون\n\n👤 ${data.name}\n📞 ${data.phone}\n🏠 ${data.project}\n💰 ${data.budget}\n⭐ ${data.priority}\n\n#${data.track}`;
             setTimeout(() => {
                 if (confirm('ارسال به واتساپ؟')) {
-                    window.open(`https://wa.me/989123456789?text=${encodeURIComponent(message)}`);
+                    window.open(`https://wa.me/989213520878?text=${encodeURIComponent(message)}`);
                 }
             }, 2000);
         }
