@@ -3,219 +3,370 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏠 ثبت اطلاعات سفارش</title>
+    <title>فرم سفارش اولیه</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Vazir', Tahoma, sans-serif; 
+        body {
+            font-family: 'Tahoma', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh; padding: 20px; 
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
-        .container { max-width: 500px; margin: 0 auto; }
-        .form-card { 
-            background: white; border-radius: 20px; 
-            padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
-            text-align: center;
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
         }
         h1 { 
-            background: linear-gradient(45deg, #667eea, #764ba2); 
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-            margin-bottom: 20px; font-size: 1.8em;
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 30px;
+            font-size: 24px;
         }
-        input, select, textarea { 
-            width: 100%; padding: 15px; margin: 10px 0; 
-            border: 2px solid #e2e8f0; border-radius: 10px; 
-            font-size: 16px; background: #f8fafc;
+        .form-group {
+            margin-bottom: 20px;
         }
-        button { 
-            background: linear-gradient(45deg, #48bb78, #38a169); 
-            color: white; padding: 18px; border: none; 
-            border-radius: 12px; cursor: pointer; font-size: 18px; 
-            font-weight: bold; width: 100%; margin-top: 20px;
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            color: #555; 
+            font-weight: bold;
         }
-        .success { 
-            background: linear-gradient(135deg, #48bb78, #38a169); 
-            color: white; border-radius: 15px; padding: 30px; 
-            text-align: center; display: none;
+        input, select, textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
         }
-        .hidden { display: none; }
-        .admin-panel { 
-            background: white; border-radius: 20px; 
-            padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
-            text-align: center; display: none;
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102,126,234,0.3);
         }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: right; border-bottom: 1px solid #eee; }
-        .status { padding: 5px 10px; border-radius: 20px; color: white; font-weight: bold; }
-        .seen { background: #4299e1; }
-        .done { background: #48bb78; }
-        @media (max-width: 480px) { .form-card, .admin-panel { padding: 30px 20px; } }
+        textarea { resize: vertical; min-height: 100px; }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            margin-bottom: 10px;
+        }
+        button:hover { transform: translateY(-2px); }
+        .customers-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .customer-item {
+            background: #f8f9ff;
+            border: 2px solid #e1e8ff;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .customer-name { 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .customer-info { 
+            color: #666; 
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        .status {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .status.seen { background: #fff3cd; color: #856404; }
+        .status.done { background: #d4edda; color: #155724; }
+        .status-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 5px 12px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-seen { background: #ffc107; color: #212529; }
+        .status-done { background: #28a745; color: white; }
+        .whatsapp-btn, .insta-btn {
+            display: inline-block;
+            padding: 12px 20px;
+            margin: 5px;
+            border-radius: 25px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+        }
+        .insta-btn {
+            background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+            color: white;
+        }
+        .password-form {
+            text-align: center;
+        }
+        .password-input {
+            font-size: 24px;
+            text-align: center;
+            letter-spacing: 5px;
+            font-weight: bold;
+        }
+        .welcome-admin {
+            text-align: center;
+            color: #28a745;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number { font-size: 28px; font-weight: bold; color: #667eea; }
+        .stat-label { color: #666; font-size: 14px; }
+        .social-links {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px dashed #eee;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- فرم مشتری -->
-        <div id="customerForm" class="form-card">
-            <h1>🏠 ثبت درخواست سفارش</h1>
-            <p style="color: #666; margin-bottom: 30px;"></p>
-            
-            <input type="text" id="name" placeholder="👤 نام و نام خانوادگی">
-            <input type="tel" id="phone" placeholder="📞 شماره تماس">
-            <input type="text" id="address" placeholder="📍 آدرس کامل">
-            <input type="text" id="project" placeholder="🏠 نوع پروژه (آشپزخانه، پذیرایی...)">
-            <input type="number" id="budget" placeholder="💰 بودجه تقریبی (تومان)">
-            <textarea id="notes" placeholder="📝 متراژ، سبک، نکات مهم..." rows="3"></textarea>
-            
-            <select id="priority">
-                <option value="عادی">⭐ عادی</option>
-                <option value="بالا">⭐⭐ بالا</option>
-                <option value="فوری">⭐⭐⭐ فوری</option>
-            </select>
-            
-            <button onclick="submitForm()">✅ ارسال درخواست</button>
+    <div class="container" id="mainContainer">
+        <!-- حالت مشتری -->
+        <div id="customerForm">
+            <h1>📋 فرم سفارش اولیه</h1>
+            <form id="customerFormData">
+                <div class="form-group">
+                    <label>👤 نام و نام خانوادگی:</label>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="form-group">
+                    <label>📱 شماره تماس:</label>
+                    <input type="tel" id="phone" required>
+                </div>
+                <div class="form-group">
+                    <label>📍 آدرس:</label>
+                    <textarea id="address" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>🏠 متراژ منزل:</label>
+                    <input type="number" id="area" placeholder="مثال: 120">
+                </div>
+                <div class="form-group">
+                    <label>💬 توضیحات پروژه:</label>
+                    <textarea id="description" placeholder="نوع دکوراسیون، رنگ‌ها، بودجه و..."></textarea>
+                </div>
+                <button type="submit">🚀 ارسال اطلاعات</button>
+            </form>
+
+            <!-- لینک‌های اجتماعی برای مشتری -->
+            <div class="social-links">
+                <p style="color: #666; margin-bottom: 15px;">📞 تماس مستقیم:</p>
+                <a href="https://wa.me/989213520878?text=سلام، از فرم وب‌سایت اومدم برای دکوراسیون منزل 📋" 
+                   class="whatsapp-btn" target="_blank">💬 تماس واتساپ</a>
+                <br>
+                <a href="https://www.instagram.com/abgineh_mirror/" 
+                   class="insta-btn" target="_blank" style="margin-top: 10px;">📸 مشاهده نمونه کارها</a>
+            </div>
         </div>
 
         <!-- پنل ادمین -->
-        <div id="adminLogin" class="form-card" style="display: none;">
-            <h1>🔐 پنل مدیریت</h1>
-            <input type="password" id="adminPass" placeholder="رمز عبور">
-            <button onclick="loginAdmin()">ورود</button>
-            <p style="font-size: 12px; color: #666; margin-top: 10px;">راهنما: Ctrl+Enter</p>
-        </div>
+        <div id="adminPanel" style="display: none;">
+            <div class="welcome-admin">✅ خوش آمدید ادمین</div>
+            
+            <!-- آمار -->
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalCount">0</div>
+                    <div class="stat-label">کل مشتریان</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="seenCount">0</div>
+                    <div class="stat-label">دیده شده</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="doneCount">0</div>
+                    <div class="stat-label">انجام شده</div>
+                </div>
+            </div>
 
-        <div id="adminPanel" class="admin-panel">
             <h1>📋 لیست مشتریان</h1>
-            <button onclick="logout()" style="background: #e53e3e; margin-bottom: 20px;">خروج</button>
-            <div id="customersList"></div>
+            <div class="customers-list" id="customersList"></div>
         </div>
 
-        <!-- موفقیت -->
-        <div id="successSection" class="success">
-            <h2>🎉 درخواست ثبت شد!</h2>
-            <p style="font-size: 18px;">شماره پیگیری: <strong id="trackId"></strong></p>
-            <p>ظرف <strong>۲۴ ساعت</strong> تماس می‌گیریم 📞</p>
-            <p style="font-size: 14px; opacity: 0.9;">ممنون از اعتمادتون!</p>
+        <!-- صفحه رمز عبور -->
+        <div id="passwordPage" style="display: none;">
+            <h1>🔐 ورود ادمین</h1>
+            <form class="password-form" id="adminLogin">
+                <input type="password" class="password-input" id="adminPassword" placeholder="رمز عبور" maxlength="20">
+                <button type="submit">ورود</button>
+                <p style="margin-top: 15px; font-size: 14px; color: #666;">
+                    💡 نکته: Ctrl+Enter هم کار می‌کنه
+                </p>
+            </form>
         </div>
     </div>
 
     <script>
+        const ADMIN_PASSWORD = 'admin123';
+        let customers = JSON.parse(localStorage.getItem('decorationCustomers')) || [];
+
+        // تشخیص حالت
         const urlParams = new URLSearchParams(window.location.search);
-        const isCustomer = urlParams.get('mode') === 'customer';
-        
-        // نمایش فرم مشتری یا پنل ادمین
-        if (isCustomer || !localStorage.getItem('adminMode')) {
-            document.getElementById('customerForm').style.display = 'block';
-            document.getElementById('adminLogin').style.display = 'none';
+        const isCustomerMode = urlParams.get('mode') === 'customer';
+
+        // نمایش حالت مناسب
+        if (isCustomerMode) {
+            showCustomerForm();
         } else {
             showAdminLogin();
         }
 
-        // کلید میانبر ادمین
-        document.addEventListener('keydown', (e) => {
+        // کلید میانبر Ctrl+Enter برای ادمین
+        document.addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.key === 'Enter') {
-                showAdminLogin();
+                loginAdmin(ADMIN_PASSWORD);
             }
         });
 
-        function showAdminLogin() {
-            document.getElementById('customerForm').style.display = 'none';
-            document.getElementById('adminLogin').style.display = 'block';
+        function showCustomerForm() {
+            document.getElementById('customerForm').style.display = 'block';
             document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('passwordPage').style.display = 'none';
+            
+            document.getElementById('customerFormData').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveCustomer();
+            });
         }
 
-        function loginAdmin() {
-            const pass = document.getElementById('adminPass').value;
-            if (pass === 'admin123') {
-                localStorage.setItem('adminMode', 'true');
-                loadCustomers();
+        function showAdminLogin() {
+            document.getElementById('customerForm').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('passwordPage').style.display = 'block';
+            
+            document.getElementById('adminLogin').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const password = document.getElementById('adminPassword').value;
+                loginAdmin(password);
+            });
+        }
+
+        function loginAdmin(password) {
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('passwordPage').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                updateCustomersList();
             } else {
-                alert('❌ رمز اشتباه!');
+                alert('❌ رمز اشتباه است!');
+                document.getElementById('adminPassword').value = '';
             }
         }
 
-        function logout() {
-            localStorage.removeItem('adminMode');
-            document.getElementById('adminLogin').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('customerForm').style.display = 'block';
-        }
-
-        function submitForm() {
-            const data = {
+        function saveCustomer() {
+            const customer = {
+                id: Date.now(),
                 name: document.getElementById('name').value,
                 phone: document.getElementById('phone').value,
                 address: document.getElementById('address').value,
-                project: document.getElementById('project').value,
-                budget: document.getElementById('budget').value,
-                notes: document.getElementById('notes').value,
-                priority: document.getElementById('priority').value,
-                track: 'TRK' + Date.now().toString().slice(-6),
-                date: new Date().toLocaleDateString('fa-IR'),
-                status: 'دیده نشده'
+                area: document.getElementById('area').value,
+                description: document.getElementById('description').value,
+                status: 'seen', // پیش‌فرض: دیده نشده
+                timestamp: new Date().toLocaleString('fa-IR')
             };
+
+            customers.unshift(customer);
+            localStorage.setItem('decorationCustomers', JSON.stringify(customers));
+
+            // پیام موفقیت
+            alert('✅ اطلاعات با موفقیت ثبت شد!\nبه زودی تماس خواهیم گرفت 📞');
             
-            if (!data.name || !data.phone) {
-                alert('❌ نام و شماره تماس الزامی است!');
-                return;
-            }
-            
-            let customers = JSON.parse(localStorage.getItem('customers')) || [];
-            customers.unshift(data);
-            localStorage.setItem('customers', JSON.stringify(customers));
-            
-            document.getElementById('trackId').textContent = data.track;
-            document.getElementById('customerForm').classList.add('hidden');
-            document.getElementById('successSection').style.display = 'block';
-            
-            const message = `🏠 درخواست جدید دکوراسیون\n\n👤 ${data.name}\n📞 ${data.phone}\n🏠 ${data.project}\n💰 ${data.budget}\n⭐ ${data.priority}\n\n#${data.track}`;
-            setTimeout(() => {
-                if (confirm('ارسال به واتساپ؟')) {
-                    window.open(`https://wa.me/989213520878?text=${encodeURIComponent(message)}`);
-                }
-            }, 2000);
+            // پاک کردن فرم
+            document.getElementById('customerFormData').reset();
         }
 
-        function loadCustomers() {
-            const customers = JSON.parse(localStorage.getItem('customers')) || [];
+        function updateCustomersList() {
             const list = document.getElementById('customersList');
-            
+            const total = customers.length;
+            const seen = customers.filter(c => c.status === 'seen').length;
+            const done = customers.filter(c => c.status === 'done').length;
+
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('seenCount').textContent = seen;
+            document.getElementById('doneCount').textContent = done;
+
             if (customers.length === 0) {
-                list.innerHTML = '<p style="text-align:center;color:#666;">هیچ درخواستی ثبت نشده</p>';
+                list.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">📭 هنوز مشتری جدیدی ثبت نشده</p>';
                 return;
             }
-            
-            let html = '<table><tr><th>نام</th><th>تلفن</th><th>پروژه</th><th>بودجه</th><th>اولویت</th><th>تاریخ</th><th>وضعیت</th></tr>';
-            
-            customers.forEach((customer, index) => {
-                html += `
-                    <tr>
-                        <td>${customer.name}</td>
-                        <td>${customer.phone}</td>
-                        <td>${customer.project}</td>
-                        <td>${customer.budget || 'نامشخص'}</td>
-                        <td>${customer.priority}</td>
-                        <td>${customer.date}</td>
-                        <td>
-                            <select onchange="updateStatus(${index}, this.value)" style="border-radius:10px;">
-                                <option ${customer.status === 'دیده نشده' ? 'selected' : ''}>دیده نشده</option>
-                                <option ${customer.status === 'دیده شده' ? 'selected' : ''}>دیده شده</option>
-                                <option ${customer.status === 'انجام شده' ? 'selected' : ''}>انجام شده</option>
-                            </select>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            html += '</table>';
-            list.innerHTML = html;
-            document.getElementById('adminPanel').style.display = 'block';
-            document.getElementById('adminLogin').style.display = 'none';
+
+            list.innerHTML = customers.map(customer => `
+                <div class="customer-item">
+                    <button class="status-btn ${customer.status}" onclick="updateStatus(${customer.id})">
+                        ${customer.status === 'seen' ? '👁️' : '✅'}
+                    </button>
+                    <div class="customer-name">${customer.name}</div>
+                    <div class="customer-info">
+                        📱 ${customer.phone}<br>
+                        📍 ${customer.address}<br>
+                        🏠 ${customer.area} متر<br>
+                        ${customer.description}
+                    </div>
+                    <div class="status ${customer.status}">وضعیت: ${customer.status === 'seen' ? 'دیده شده' : 'انجام شده'}</div>
+                    <br>
+                    <a href="https://wa.me/${customer.phone}?text=سلام ${customer.name}%0Aاطلاعات شما دریافت شد%0Aمنتظر تماس ما باشید 📞" 
+                       class="whatsapp-btn" target="_blank">💬 واتساپ مشتری</a>
+                    <a href="https://wa.me/989213520878?text=مشتری جدید: ${customer.name} - ${customer.phone}" 
+                       class="whatsapp-btn" target="_blank" style="background: #128C7E;">📞 تماس با ما</a>
+                    <br>
+                    <a href="https://www.instagram.com/abgineh_mirror/" 
+                       class="insta-btn" target="_blank">📸 اینستاگرام</a>
+                    <div style="font-size: 12px; color: #999; margin-top: 10px;">
+                        ${customer.timestamp}
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function updateStatus(index, status) {
-            let customers = JSON.parse(localStorage.getItem('customers')) || [];
-            customers[index].status = status;
-            localStorage.setItem('customers', JSON.stringify(customers));
+        function updateStatus(customerId) {
+            const customer = customers.find(c => c.id === customerId);
+            if (customer) {
+                customer.status = customer.status === 'seen' ? 'done' : 'seen';
+                localStorage.setItem('decorationCustomers', JSON.stringify(customers));
+                updateCustomersList();
+            }
         }
     </script>
 </body>
